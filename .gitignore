@@ -4,3 +4,4 @@ Dockerfile
 /obj
 /.idea
 /.vs
+config.json
