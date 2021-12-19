@@ -1,4 +1,9 @@
-﻿namespace DiscordBot
+﻿using System;
+using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.EventArgs;
+
+namespace OlanBot
 {
     public class OlanBot
     {
@@ -6,6 +11,12 @@
         public OlanBot()
         {
             _codeHandler = new CodeHandler();
+        }
+        
+        public Task OnMessageCreated(DiscordClient _, MessageCreateEventArgs e)
+        {
+            Console.WriteLine("Hello world!");
+            return Task.CompletedTask;
         }
         
         

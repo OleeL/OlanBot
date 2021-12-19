@@ -4,12 +4,12 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using DiscordBot.Models;
+using OlanBot.Models;
 using Newtonsoft.Json;
 
 
 // Permission int: 3072
-namespace DiscordBot
+namespace OlanBot
 {
     public class Program
     {
@@ -27,12 +27,14 @@ namespace DiscordBot
                 Token = config.Token,
                 TokenType = TokenType.Bot,
             });
+            
+            Console.WriteLine("OlanBot Started");
+            _olanBot = new OlanBot();
 
-            discordClient.MessageCreated += OnMessageCreated;
+            discordClient.MessageCreated += _olanBot.OnMessageCreated;
 
             await discordClient.ConnectAsync();
             await Task.Delay(-1);
-            _olanBot = new OlanBot();
         }
 
         private async Task<Config> InitConfig(string filename)
@@ -51,15 +53,10 @@ namespace DiscordBot
 
             if (config?.Token == null)
             {
-                throw new Exception("NO TOKEN IN CONFIG.JSON");
+                throw new Exception("NO TOKEN IN "+filename);
             }
 
             return config;
-        }
-
-        private async Task OnMessageCreated(MessageCreateEventArgs e)
-        {
-            await Task.Run(() => { Console.WriteLine("Hello"); });
         }
     }
 }

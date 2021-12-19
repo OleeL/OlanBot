@@ -1,14 +1,4 @@
-﻿using DSharpPlus;
-using DSharpPlus.EventArgs;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using DSharpPlus.Entities;
-
-
-// Permission int: 3072
-namespace DiscordBot
+﻿namespace OlanBot
 {
     public class CodeHandler
     {
@@ -17,7 +7,8 @@ namespace DiscordBot
             "java" => "java",
             "python" => "python",
             "c" => "C",
-            "c++" => "C++",
+            "c++" => "cpp",
+            "cpp" => "cpp",
             "nodejs" => "NodeJS",
             "javascript" => "JavaScript",
             "groovy" => "Groovy",

@@ -1,4 +1,4 @@
-﻿namespace DiscordBot.Models
+﻿namespace OlanBot.Models
 {
     public class Config
     {
