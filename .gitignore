@@ -5,3 +5,4 @@ Dockerfile
 /.idea
 /.vs
 config.json
+*.sln.DotSettings.user

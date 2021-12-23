@@ -1,75 +1,80 @@
-﻿namespace OlanBot
+﻿using System.Buffers;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using DSharpPlus;
+using DSharpPlus.Entities;
+using OlanBot.Models;
+using OlanBot.Models.DTOs.JDoodle;
+using OlanBot.Services;
+
+namespace OlanBot
 {
     public class CodeHandler
     {
-        public string LinkConverter(string name) => name switch
+        private readonly Config _config;
+        private readonly JDoodleHandler _jDoodleHandler;
+
+        private static bool IsValidRequest(string message) => Regex.Match(message, "```").Success;
+
+        private static string GetLanguage(string message) =>
+            Regex.Match(message, "`+.*").Value.Replace("`", "");
+
+        private static async Task PrintResponse(DiscordClient discordClient, DiscordChannel discordChannel,
+            JDoodleExecutionResponse message)
         {
-            "java" => "java",
-            "python" => "python",
-            "c" => "C",
-            "c++" => "cpp",
-            "cpp" => "cpp",
-            "nodejs" => "NodeJS",
-            "javascript" => "JavaScript",
-            "groovy" => "Groovy",
-            "jshell" => "JShell",
-            "haskell" => "Haskell",
-            "tcl" => "Tcl",
-            "lua" => "Lua",
-            "ada" => "Ada",
-            "commonlisp" => "CommonLisp",
-            "d" => "D",
-            "elixir" => "Elixir",
-            "erlang" => "Erlang",
-            "f#" => "fsharp",
-            "fortran" => "Fortran",
-            "assembly" => "Assembly",
-            "scala" => "Scala",
-            "php" => "Php",
-            "python2" => "Python2",
-            "c#" => "C#",
-            "perl" => "Perl",
-            "ruby" => "Ruby",
-            "go" => "Go",
-            "r" => "R",
-            "racket" => "Racket",
-            "ocaml" => "OCaml",
-            "vb" => "vb",
-            "visualbasic" => "visualbasic",
-            "bash" => "Bash",
-            "clojure" => "Clojure",
-            "typescript" => "TypeScript",
-            "cobol" => "Cobol",
-            "kotlin" => "Kotlin",
-            "pascal" => "Pascal",
-            "prolog" => "Prolog",
-            "rust" => "Rust",
-            "swift" => "Swift",
-            "octave" => "Octave",
-            "html" => "HTML",
-            "materialize" => "Materialize",
-            "bootstrap" => "Bootstrap",
-            "foundation" => "Foundation",
-            "bulma" => "Bulma",
-            "uikit" => "Uikit",
-            "semantic UI" => "Semantic UI",
-            "skeleton" => "Skeleton",
-            "milligram" => "Milligram",
-            "papercss" => "PaperCSS",
-            "mysql" => "MySQL",
-            "postgresql" => "PostgreSQL",
-            "mongodb" => "MongoDB",
-            "sqlite" => "SQLite",
-            "redis" => "Redis",
-            "mariadb" => "MariaDB",
-            _ => "",
-        };
-        
-        public CodeHandler()
-        {
-            
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("```");
+            stringBuilder.AppendLine(message.CodeOutput);
+            stringBuilder.AppendLine("```");
+            if (message.CpuTime != null)
+            {
+                stringBuilder.Append("CPU Time: ");
+                stringBuilder.AppendLine(message.CpuTime);
+            }
+
+            if (message.MemoryUsed != null)
+            {
+                stringBuilder.Append("Memory Used: ");
+                stringBuilder.AppendLine(message.MemoryUsed);
+            }
+
+            var embed = new DiscordEmbedBuilder
+            {
+                Title = "Code Response",
+                Description = stringBuilder.ToString(),
+                Color = new DiscordColor(0x00FF00)
+            };
+            await discordChannel.SendMessageAsync(embed: embed);
         }
-        
-        
+
+        public CodeHandler(Config config)
+        {
+            _config = config;
+            _jDoodleHandler = new JDoodleHandler(config.JdConfig);
+        }
+
+        // Scrapes the message for code
+        public async Task ScrapeMessage(DiscordClient discordClient, DiscordChannel discordChannel, string message)
+        {
+            if (!IsValidRequest(message))
+            {
+                return;
+            }
+
+            var language = GetLanguage(message);
+            if (language == "")
+            {
+                return;
+            }
+
+            var match = Regex.Match(message, "```");
+            var start = match.Index + match.Length + language.Length;
+            var end = match.NextMatch().Index;
+            var code = message.Substring(start, end - start);
+
+            var response = await _jDoodleHandler.SendCode(language, code, "", "");
+            await PrintResponse(discordClient, discordChannel, response);
+        }
     }
 }

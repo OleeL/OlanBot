@@ -29,7 +29,7 @@ namespace OlanBot
             });
             
             Console.WriteLine("OlanBot Started");
-            _olanBot = new OlanBot();
+            _olanBot = new OlanBot(config);
 
             discordClient.MessageCreated += _olanBot.OnMessageCreated;
 

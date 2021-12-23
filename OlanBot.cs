@@ -1,22 +1,27 @@
 ﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
+using OlanBot.Models;
+using OlanBot.Services;
 
 namespace OlanBot
 {
     public class OlanBot
     {
-        CodeHandler _codeHandler;
-        public OlanBot()
-        {
-            _codeHandler = new CodeHandler();
+        private readonly CodeHandler _codeHandler;
+        
+        public OlanBot(Config config)
+        {   
+            _codeHandler = new CodeHandler(config);
         }
         
-        public Task OnMessageCreated(DiscordClient _, MessageCreateEventArgs e)
+        public async Task OnMessageCreated(DiscordClient _, MessageCreateEventArgs e)
         {
-            Console.WriteLine("Hello world!");
-            return Task.CompletedTask;
+            var message = e.Message.Content;
+            await _codeHandler.ScrapeMessage(_, e.Channel, message);
         }
         
         
