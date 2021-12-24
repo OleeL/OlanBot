@@ -21,7 +21,7 @@ namespace OlanBot
         public async Task OnMessageCreated(DiscordClient _, MessageCreateEventArgs e)
         {
             var message = e.Message.Content;
-            await _codeHandler.ScrapeMessage(_, e.Channel, message);
+            await Task.Run(() => _codeHandler.ScrapeMessage(_, e.Channel, message));
         }
         
         
