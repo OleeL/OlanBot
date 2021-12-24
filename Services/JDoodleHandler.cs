@@ -12,19 +12,19 @@ namespace OlanBot.Services;
 
 public class JDoodleHandler
 {
-    private readonly JDoodleConfig _Config;
+    private readonly JDoodleConfig _config;
     
     public JDoodleHandler(JDoodleConfig config)
     {
-        _Config = config;
+        _config = config;
     }
 
     public async Task<JDoodleExecutionResponse> SendCode(string language, string code, string stdin, string version)
     {
            var dto = new JDoodleExecution()
            {
-               ClientSecret = _Config.ClientSecret,
-               ClientId = _Config.ClientId,
+               ClientSecret = _config.ClientSecret,
+               ClientId = _config.ClientId,
                Language = language,
                Script = code,
                Stdin = stdin,
@@ -32,7 +32,7 @@ public class JDoodleHandler
            };
            
            var json = JsonConvert.SerializeObject(dto);
-           var serializedResponse = await PostRequest(_Config.Url, "/v1/execute", json);
+           var serializedResponse = await PostRequest(_config.Url, "/v1/execute", json);
            return JsonConvert.DeserializeObject<JDoodleExecutionResponse>(serializedResponse);
     }
 

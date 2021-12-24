@@ -30,13 +30,15 @@ namespace OlanBot
             if (message.CpuTime != null)
             {
                 stringBuilder.Append("CPU Time: ");
-                stringBuilder.AppendLine(message.CpuTime);
+                stringBuilder.Append(message.CpuTime);
+                stringBuilder.AppendLine(" sec(s)");
             }
 
             if (message.MemoryUsed != null)
             {
                 stringBuilder.Append("Memory Used: ");
-                stringBuilder.AppendLine(message.MemoryUsed);
+                stringBuilder.Append(message.MemoryUsed);
+                stringBuilder.AppendLine("kb(s)");
             }
 
             var embed = new DiscordEmbedBuilder
