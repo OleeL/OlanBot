@@ -78,8 +78,10 @@ namespace OlanBot
         private static DiscordActivity GetActivity()
         {
 #if DEBUG
+            Console.WriteLine("DEBUG MODE");
             return new DiscordActivity("with the debugger", ActivityType.Playing);
 #endif
+            Console.WriteLine("RELEASE MODE");
             return new DiscordActivity("your code", ActivityType.Watching);
         }
     }
