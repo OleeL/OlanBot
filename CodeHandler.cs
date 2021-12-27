@@ -21,14 +21,15 @@ namespace OlanBot
 
         private static bool IsValidRequest(string message) => Regex.Match(message, "```").Success;
 
-        private static string GetLanguage(string message) =>
-            Regex.Match(message, "`+.*").Value.Replace("`", "");
+        private static string GetLanguage(string message) => Regex.Match(message, "`+.*")
+            .Value
+            .Replace("`", "");
 
         private static string TruncateCode(string code) =>
             code.Substring(Math.Max(code.Length - MaxLength, 0), Math.Min(code.Length, MaxLength));
 
         private static async Task PrintResponse(DiscordChannel discordChannel,
-            JDoodleExecutionResponse message)
+            JDoodleExecutionResponse message, string language)
         {
             
             var stringBuilder = new StringBuilder();
@@ -39,6 +40,9 @@ namespace OlanBot
             }
             stringBuilder.AppendLine(TruncateCode(message.CodeOutput));
             stringBuilder.AppendLine("```");
+            
+            stringBuilder.Append("Language Used: ");
+            stringBuilder.AppendLine(language);
             if (message.CpuTime != null)
             {
                 stringBuilder.Append("CPU Time: ");
@@ -79,21 +83,21 @@ namespace OlanBot
                 return;
             }
 
-            var language = GetLanguage(message);
-            if (language == "")
+            var language = new Language(GetLanguage(message));
+            if (language.Mapped == "")
             {
                 return;
             }
 
             var match = Regex.Match(message, "```");
-            var start = match.Index + match.Length + language.Length;
+            var start = match.Index + match.Length + language.Written.Length;
             var end = match.NextMatch().Index;
             var code = message.Substring(start, end - start);
 
-            var response = await _jDoodleHandler.SendCode(language, code, "", "");
+            var response = await _jDoodleHandler.SendCode(language.Mapped, code, "", "");
             if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
             {
-                await PrintResponse(discordChannel, response);
+                await PrintResponse(discordChannel, response, language.Mapped);
             }
             else
             {
