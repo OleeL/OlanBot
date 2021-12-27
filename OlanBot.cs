@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 using OlanBot.Models;
-using OlanBot.Services;
 
 namespace OlanBot
 {
-    public class OlanBot
+    public class OlanBot : BaseCommandModule
     {
         private readonly CodeHandler _codeHandler;
         
@@ -20,10 +20,32 @@ namespace OlanBot
         
         public async Task OnMessageCreated(DiscordClient _, MessageCreateEventArgs e)
         {
-            var message = e.Message.Content;
-            await Task.Run(() => _codeHandler.ScrapeMessage(_, e.Channel, message));
+            await Task.Run(() => _codeHandler.ScrapeMessage(e.Channel, e));
         }
-        
+
+
+
+        public async Task OnReady(DiscordClient discordClient, ReadyEventArgs e)
+        {
+            Console.WriteLine("OlanBot Ready");
+            // await discordClient.CreateGlobalApplicationCommandAsync(new DiscordApplicationCommand(
+            //     "help",
+            //     "Learn how to use OlanBot"));
+            
+        }
+
+        //
+        // [Command("help"), Description("Learn how to use OlanBotL")]
+        // public async Task CommandHelp(CommandContext ctx, DiscordChannel chn = null)
+        // {
+        //     await ctx.Message.RespondAsync("```" +
+        //                                  "OlanBot Commands:\n" +
+        //                                  "    Write code blocks and I will scrapes the code and try to compile it\n" +
+        //                                  "    help - Displays this message\n" +
+        //                                  "Reactions:" +
+        //                                  "    ⁉️ - Language not supported```");
+        // }
+        //
         
     }
 }

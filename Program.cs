@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using DSharpPlus.Entities;
 using OlanBot.Models;
 using Newtonsoft.Json;
 
@@ -28,13 +29,28 @@ namespace OlanBot
                 TokenType = TokenType.Bot,
             });
             
-            Console.WriteLine("OlanBot Started");
             _olanBot = new OlanBot(config);
 
             discordClient.MessageCreated += _olanBot.OnMessageCreated;
+            discordClient.Ready += _olanBot.OnReady;
+            discordClient.InteractionCreated += HandleSlashCommands;
 
-            await discordClient.ConnectAsync();
+            await discordClient.ConnectAsync(GetActivity(), UserStatus.DoNotDisturb);
+
             await Task.Delay(-1);
+        }
+
+        public async Task HandleSlashCommands(DiscordClient client, InteractionCreateEventArgs e)
+        {
+            var interaction = new DiscordInteractionResponseBuilder().WithContent(
+                "OlanBot Write code blocks and I will scrape the code and try to compile it\n" +
+                "Commands:\n" +
+                " - **/help** - Displays this message\n" +
+                "Reaction Meaning:\n" +
+                "    ⁉️ - Language not supported").AsEphemeral(true);
+            await e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, interaction);
+            // await e.Interaction.CreateResponseAsync(InteractionResponseType.Pong, interaction);
+
         }
 
         private async Task<Config> InitConfig(string filename)
@@ -53,10 +69,18 @@ namespace OlanBot
 
             if (config?.Token == null)
             {
-                throw new Exception("NO TOKEN IN "+filename);
+                throw new Exception("NO TOKEN IN " + filename);
             }
 
             return config;
+        }
+
+        private static DiscordActivity GetActivity()
+        {
+#if DEBUG
+            return new DiscordActivity("with the debugger", ActivityType.Playing);
+#endif
+            return new DiscordActivity("your code", ActivityType.Watching);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Net;
+using Newtonsoft.Json;
 
 namespace OlanBot.Models.DTOs.JDoodle;
 
@@ -8,7 +9,7 @@ public class JDoodleExecutionResponse
     public string CodeOutput { get; set; }
     
     [JsonProperty("statusCode")]
-    public int HttpStatusCode { get; set; }
+    public HttpStatusCode HttpStatusCode { get; set; }
     
     [JsonProperty("memory")]
     public string MemoryUsed { get; set; }
