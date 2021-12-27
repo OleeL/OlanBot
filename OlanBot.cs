@@ -28,10 +28,9 @@ namespace OlanBot
         public Task OnReady(DiscordClient discordClient, ReadyEventArgs e)
         {
             Console.WriteLine("OlanBot Ready");
-            return Task.CompletedTask;
-            // await discordClient.CreateGlobalApplicationCommandAsync(new DiscordApplicationCommand(
-            //     "help",
-            //     "Learn how to use OlanBot"));
+            return discordClient.CreateGlobalApplicationCommandAsync(new DiscordApplicationCommand(
+                "help",
+                "Learn how to use OlanBot"));
         }
 
         //
